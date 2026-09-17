@@ -1,0 +1,33 @@
+# Java / Maven
+target/
+*.class
+*.jar
+!.mvn/wrapper/maven-wrapper.jar
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.settings/
+.classpath
+.project
+
+# Node
+node_modules/
+dist/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# OS
+.DS_Store
+
+# Secrets & env
+.env
+application-local.yml
+
+# Local tool state (not part of course deliverables)
+.commandcode/

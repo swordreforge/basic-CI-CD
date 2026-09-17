@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: exp1-web-crud
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/selflearn?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
+    username: exp1
+    password: 114514
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+      data-locations: classpath:data.sql
+
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+
+server:
+  port: 8878

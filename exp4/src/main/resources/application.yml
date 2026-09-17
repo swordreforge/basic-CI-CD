@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: exp4-security
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/selflearn?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
+    username: root
+    password: root
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+      data-locations: classpath:data.sql
+
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+
+server:
+  port: 8081
+
+app:
+  jwt:
+    secret: selflearn-demo-jwt-secret-key-please-change-in-production-0123456789
+    expiration-ms: 3600000

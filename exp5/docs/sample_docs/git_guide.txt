@@ -1,0 +1,4 @@
+团队 Git 分支模型：main 为稳定分支，develop 为开发主线，feature/* 为功能分支。
+提交信息遵循 Conventional Commits，例如 feat: add user list api、fix: handle null email。
+每个 Pull Request 至少由一名其他成员评审通过后才能合并。
+禁止把密钥、环境文件、构建产物提交到仓库。

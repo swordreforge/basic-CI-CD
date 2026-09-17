@@ -1,0 +1,5 @@
+《团队规范项目实训》是浙江师范大学计算机类专业的实践课程。
+课程目标包括工程基础能力、AI 素养、人机协作、团队工程规范、伦理安全。
+技术栈：后端 Spring Boot / SSM，前端 Vue.js，数据库 MySQL，版本控制 Git。
+个人技能实训包含五个实验：实验一搭建 Web 基础项目，实验二前后端分离与 RESTful API，实验三 Git 协作与持续集成，实验四登录权限与 AI 安全，实验五 LLM 应用与 RAG 原型。
+实验一需要 JDK 17、Maven、MySQL，起步依赖包括 spring-boot-starter-web、mybatis-spring-boot-starter、mysql-connector-j。
