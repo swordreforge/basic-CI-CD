@@ -30,6 +30,10 @@ mvn spring-boot:run
 | admin | admin123 | ADMIN |
 | user | user123 | USER |
 
+## 简易前端
+
+启动后浏览器访问 http://localhost:8081/ 即可看到登录 / 用户列表 / AI 安全检测页面（`src/main/resources/static/index.html`）。
+
 ## 接口验证
 
 ```bash
@@ -54,6 +58,6 @@ curl -X POST http://localhost:8081/api/ai/check \
 ## 安全说明
 
 - 密码使用 `BCryptPasswordEncoder` 加密，绝不入库明文。
-- 前端不裸存明文令牌；本示例仅演示，接入前端时应做合理存储策略。
+- 演示前端为简化将 token 存入 `localStorage`；生产环境应改用 HttpOnly Cookie 或更安全的存储方案。
 - `@PreAuthorize` 控制接口访问，`/api/auth/**` 放行，其余接口需认证。
 - 提示注入与脱敏示例见 `AiSecurityGuard` 与 `docs/ai-security.md`。

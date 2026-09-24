@@ -50,6 +50,10 @@ curl -X POST http://localhost:8000/rag/ask \
   -d '{"question":"实验一需要哪些技术栈？"}'
 ```
 
+## 简易前端
+
+启动 `uvicorn app:app --reload` 后，浏览器访问 http://localhost:8000/ 会重定向到问答页面（`static/index.html`）。
+
 ## 模块说明
 
 | 文件 | 作用 |
