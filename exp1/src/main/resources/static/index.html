@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>实验一 · 用户管理</title>
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; max-width: 720px; margin: 24px auto; padding: 0 16px; color: #222; }
+    h1 { font-size: 20px; }
+    form { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+    input, button { padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+    button { cursor: pointer; background: #fff; }
+    table { width: 100%; border-collapse: collapse; background: #fff; }
+    th, td { border: 1px solid #e3e5e8; padding: 8px; text-align: left; }
+    .error { color: #c0392b; }
+  </style>
+</head>
+<body>
+  <h1>实验一 · 用户 CRUD</h1>
+  <p class="error" id="error"></p>
+
+  <form id="userForm">
+    <input type="hidden" id="id">
+    <input id="username" placeholder="用户名" required>
+    <input id="password" placeholder="密码" required>
+    <input id="email" placeholder="邮箱">
+    <button type="submit" id="submitBtn">新增</button>
+    <button type="button" id="resetBtn">清空</button>
+  </form>
+
+  <table>
+    <thead>
+      <tr><th>ID</th><th>用户名</th><th>邮箱</th><th>操作</th></tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
+
+  <script>
+    const API = '/api/users';
+    const errorEl = document.getElementById('error');
+
+    async function load() {
+      errorEl.textContent = '';
+      try {
+        const res = await fetch(API);
+        if (!res.ok) throw new Error('加载失败: ' + res.status);
+        const users = await res.json();
+        document.getElementById('tbody').innerHTML = users.map(u =>
+          `<tr><td>${u.id}</td><td>${u.username}</td><td>${u.email || ''}</td>
+           <td><button onclick="edit(${u.id})">编辑</button>
+           <button onclick="remove(${u.id})">删除</button></td></tr>`
+        ).join('');
+      } catch (e) {
+        errorEl.textContent = e.message;
+      }
+    }
+
+    function edit(id) {
+      fetch(`${API}/${id}`).then(r => r.json()).then(u => {
+        document.getElementById('id').value = u.id;
+        document.getElementById('username').value = u.username;
+        // AI-assisted: 回显时不填密码哈希（避免二次加密），留空即保留原密码，人工已复核。
+        const pwd = document.getElementById('password');
+        pwd.value = '';
+        pwd.required = false;
+        pwd.placeholder = '留空则不修改密码';
+        document.getElementById('email').value = u.email || '';
+        document.getElementById('submitBtn').textContent = '更新';
+      });
+    }
+
+    async function remove(id) {
+      await fetch(`${API}/${id}`, { method: 'DELETE' });
+      load();
+    }
+
+    document.getElementById('resetBtn').onclick = () => {
+      document.getElementById('userForm').reset();
+      document.getElementById('id').value = '';
+      const pwd = document.getElementById('password');
+      pwd.required = true;
+      pwd.placeholder = '密码';
+      document.getElementById('submitBtn').textContent = '新增';
+    };
+
+    document.getElementById('userForm').onsubmit = async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('id').value;
+      const pwdVal = document.getElementById('password').value;
+      const payload = {
+        username: document.getElementById('username').value,
+        email: document.getElementById('email').value
+      };
+      // 更新且密码留空时不传 password 字段，后端保留原哈希
+      if (!id || pwdVal) payload.password = pwdVal;
+      const body = JSON.stringify(payload);
+      const url = id ? `${API}/${id}` : API;
+      const method = id ? 'PUT' : 'POST';
+      await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body });
+      document.getElementById('resetBtn').click();
+      load();
+    };
+
+    load();
+  </script>
+</body>
+</html>

@@ -18,10 +18,16 @@ async function load() {
 
 async function save() {
   try {
+    // AI-assisted: 更新且密码留空时不传 password 字段，后端保留原哈希，人工已复核。
+    const payload = {
+      username: form.value.username,
+      email: form.value.email
+    }
+    if (!form.value.id || form.value.password) payload.password = form.value.password
     if (form.value.id) {
-      await updateUser(form.value.id, form.value)
+      await updateUser(form.value.id, payload)
     } else {
-      await createUser(form.value)
+      await createUser(payload)
     }
     form.value = { id: null, username: '', password: '', email: '' }
     await load()
@@ -31,7 +37,8 @@ async function save() {
 }
 
 function edit(user) {
-  form.value = { ...user }
+  // 回显时不带出密码哈希（避免二次加密），留空即保留原密码
+  form.value = { id: user.id, username: user.username, password: '', email: user.email || '' }
 }
 
 async function remove(id) {
@@ -48,7 +55,7 @@ onMounted(load)
 
     <form class="form" @submit.prevent="save">
       <input v-model="form.username" placeholder="用户名" required />
-      <input v-model="form.password" placeholder="密码" required />
+      <input v-model="form.password" :placeholder="form.id ? '留空则不修改密码' : '密码'" :required="!form.id" />
       <input v-model="form.email" placeholder="邮箱" />
       <button type="submit">{{ form.id ? '更新' : '新增' }}</button>
     </form>

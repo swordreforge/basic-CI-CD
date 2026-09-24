@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>实验五 · 学习搭子问答</title>
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; max-width: 720px; margin: 24px auto; padding: 0 16px; color: #222; }
+    h1 { font-size: 20px; }
+    h2 { font-size: 16px; }
+    .panel { background: #fff; border: 1px solid #e3e5e8; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+    input { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; margin-bottom: 8px; }
+    button { padding: 8px 16px; border: 1px solid #ccc; border-radius: 4px; background: #fff; cursor: pointer; }
+    pre { white-space: pre-wrap; background: #f5f6f8; padding: 12px; border-radius: 6px; }
+    .error { color: #c0392b; }
+  </style>
+</head>
+<body>
+  <h1>实验五 · 学习搭子智能问答</h1>
+  <p class="error" id="error"></p>
+
+  <div class="panel">
+    <h2>直接问答</h2>
+    <input id="q1" placeholder="输入任意问题">
+    <button onclick="submitAsk('/ask', 'q1', 'a1')">提问</button>
+    <pre id="a1"></pre>
+  </div>
+
+  <div class="panel">
+    <h2>基于资料问答（RAG）</h2>
+    <input id="q2" placeholder="例如：实验一需要哪些技术栈？">
+    <button onclick="submitAsk('/rag/ask', 'q2', 'a2')">提问</button>
+    <pre id="a2"></pre>
+  </div>
+
+  <script>
+    async function submitAsk(path, qId, aId) {
+      const question = document.getElementById(qId).value;
+      document.getElementById('error').textContent = '';
+      try {
+        const res = await fetch(path, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ question })
+        });
+        const data = await res.json();
+        document.getElementById(aId).textContent = data.answer;
+      } catch (err) {
+        document.getElementById('error').textContent = err.message;
+      }
+    }
+  </script>
+</body>
+</html>

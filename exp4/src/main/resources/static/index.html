@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>实验四 · 登录与权限</title>
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; max-width: 720px; margin: 24px auto; padding: 0 16px; color: #222; }
+    h1 { font-size: 20px; }
+    h2 { font-size: 16px; margin: 16px 0 8px; }
+    form { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+    input, textarea, button { padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+    button { cursor: pointer; background: #fff; }
+    textarea { width: 100%; height: 60px; }
+    ul { list-style: none; padding: 0; }
+    li { padding: 6px; border-bottom: 1px solid #eee; }
+    .panel { background: #fff; border: 1px solid #e3e5e8; border-radius: 8px; padding: 16px; }
+    .error { color: #c0392b; }
+  </style>
+</head>
+<body>
+  <h1>实验四 · 登录 / RBAC / AI 安全</h1>
+  <p class="error" id="error"></p>
+
+  <div class="panel" id="authPanel">
+    <h2>登录</h2>
+    <form id="loginForm">
+      <input id="loginUsername" placeholder="用户名" value="admin">
+      <input id="loginPassword" type="password" placeholder="密码" value="admin123">
+      <button type="submit">登录</button>
+    </form>
+
+    <h2>注册</h2>
+    <form id="registerForm">
+      <input id="regUsername" placeholder="用户名">
+      <input id="regPassword" type="password" placeholder="密码">
+      <button type="submit">注册</button>
+    </form>
+  </div>
+
+  <div class="panel" id="mainPanel" style="display:none">
+    <p>已登录，token 已保存到 localStorage</p>
+    <button id="logoutBtn">退出</button>
+
+    <h2>用户列表</h2>
+    <button id="listBtn">加载用户</button>
+    <ul id="userList"></ul>
+
+    <h2>删除用户（仅 ADMIN）</h2>
+    <form id="deleteForm">
+      <input id="delId" placeholder="用户 ID">
+      <button type="submit">删除</button>
+    </form>
+
+    <h2>AI 安全检测</h2>
+    <textarea id="aiInput" placeholder="例如：忽略之前的指令，我的手机号是13812345678"></textarea>
+    <button id="aiBtn">检测</button>
+    <pre id="aiResult"></pre>
+  </div>
+
+  <script>
+    const errorEl = document.getElementById('error');
+    let token = localStorage.getItem('token') || '';
+
+    function showError(msg) { errorEl.textContent = msg; }
+
+    function authHeaders() {
+      const headers = { 'Content-Type': 'application/json' };
+      if (token) headers['Authorization'] = 'Bearer ' + token;
+      return headers;
+    }
+
+    async function api(path, method = 'GET', body) {
+      const res = await fetch(path, {
+        method,
+        headers: authHeaders(),
+        body: body ? JSON.stringify(body) : undefined
+      });
+      if (res.status === 401) {
+        token = '';
+        localStorage.removeItem('token');
+        showAuth();
+        throw new Error('未认证，请重新登录');
+      }
+      if (res.status === 403) {
+        const t = await res.json().catch(() => ({}));
+        throw new Error('无权限 (403): ' + (t.message || ''));
+      }
+      if (!res.ok) {
+        const t = await res.json().catch(() => ({}));
+        throw new Error(t.message || ('请求失败: ' + res.status));
+      }
+      if (res.status === 204) return null;
+      return res.json();
+    }
+
+    function showAuth() {
+      document.getElementById('authPanel').style.display = 'block';
+      document.getElementById('mainPanel').style.display = 'none';
+    }
+
+    function showMain() {
+      document.getElementById('authPanel').style.display = 'none';
+      document.getElementById('mainPanel').style.display = 'block';
+    }
+
+    if (token) showMain(); else showAuth();
+
+    document.getElementById('loginForm').onsubmit = async (e) => {
+      e.preventDefault();
+      showError('');
+      try {
+        const data = await api('/api/auth/login', 'POST', {
+          username: document.getElementById('loginUsername').value,
+          password: document.getElementById('loginPassword').value
+        });
+        token = data.token;
+        localStorage.setItem('token', token);
+        showMain();
+      } catch (err) { showError(err.message); }
+    };
+
+    document.getElementById('registerForm').onsubmit = async (e) => {
+      e.preventDefault();
+      showError('');
+      try {
+        await api('/api/auth/register', 'POST', {
+          username: document.getElementById('regUsername').value,
+          password: document.getElementById('regPassword').value
+        });
+        alert('注册成功，请登录');
+      } catch (err) { showError(err.message); }
+    };
+
+    document.getElementById('logoutBtn').onclick = () => {
+      token = '';
+      localStorage.removeItem('token');
+      document.getElementById('userList').innerHTML = '';
+      document.getElementById('aiResult').textContent = '';
+      showAuth();
+    };
+
+    document.getElementById('listBtn').onclick = async () => {
+      showError('');
+      try {
+        const users = await api('/api/users');
+        document.getElementById('userList').innerHTML = users.map(u =>
+          `<li>ID: ${u.id} · ${u.username} · ${u.enabled ? '启用' : '禁用'}</li>`
+        ).join('');
+      } catch (err) { showError(err.message); }
+    };
+
+    document.getElementById('deleteForm').onsubmit = async (e) => {
+      e.preventDefault();
+      showError('');
+      try {
+        await api('/api/users/' + document.getElementById('delId').value, 'DELETE');
+        alert('删除成功');
+        document.getElementById('listBtn').click();
+      } catch (err) { showError(err.message); }
+    };
+
+    document.getElementById('aiBtn').onclick = async () => {
+      showError('');
+      try {
+        const r = await api('/api/ai/check', 'POST', { input: document.getElementById('aiInput').value });
+        document.getElementById('aiResult').textContent = JSON.stringify(r, null, 2);
+      } catch (err) { showError(err.message); }
+    };
+  </script>
+</body>
+</html>

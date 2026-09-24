@@ -46,6 +46,10 @@ mvn clean package
 java -jar target/exp1-web-crud-1.0.0.jar
 ```
 
+## 简易前端
+
+启动后浏览器访问 http://localhost:8878/ 即可看到用户管理页面（`src/main/resources/static/index.html`），无需单独构建前端。编辑用户时密码框留空即保留原密码，只有填写新密码时才会更新（BCrypt 重新加密）。
+
 ## 接口验证
 
 | 方法 | 路径 | 说明 |
@@ -57,10 +61,10 @@ java -jar target/exp1-web-crud-1.0.0.jar
 | DELETE | `/api/users/{id}` | 删除用户 |
 
 ```bash
-curl http://localhost:8080/api/users
-curl -X POST http://localhost:8080/api/users \
+curl http://localhost:8878/api/users
+curl -X POST http://localhost:8878/api/users \
   -H "Content-Type: application/json" \
   -d '{"username":"carol","password":"123456","email":"carol@example.com"}'
 ```
 
-> 说明：本实验为演示 CRUD，密码仍为明文，实验四将引入 BCrypt 加密。
+> 说明：新建与更新接口均用 BCrypt 加密后入库（`PasswordEncoder`，见 `UserService`），更新时密码留空则保留原哈希；种子数据 `data.sql` 中的 alice/bob 本就存放哈希。查库可见 `$2a$` 开头哈希，而非明文。
