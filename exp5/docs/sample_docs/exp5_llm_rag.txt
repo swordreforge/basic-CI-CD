@@ -1,0 +1,6 @@
+实验五为 LLM 应用开发与智能功能原型，原型名为学习搭子智能问答，服务端口为 8000。
+核心封装为 llm.py 的 ask(question) 函数，支持 System 与 User 两角色提示词，temperature 参数控制输出稳定性。
+提示工程示例：分类任务只输出技术、生活、学习三选一且 temperature 为 0，摘要任务要求 50 字以内只输出摘要本身。
+RAG 流程为文档切块、向量化、余弦相似度检索 Top-3、拼入提示、约束作答，系统提示明确只根据资料回答，没有则说不知道。
+向量模式 EMBEDDING_MODE 有 api、hash、auto 三种，auto 默认优先调用嵌入接口，失败自动回退离线哈希向量。
+原型接口为 POST /ask 直接问答与 POST /rag/ask 基于资料问答，浏览器访问 http://localhost:8000/ 打开问答页面。

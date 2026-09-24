@@ -1,0 +1,5 @@
+实验三为 Git 协作开发与持续集成，分支模型为 main 稳定分支、develop 开发主线、feature/* 功能分支、hotfix/* 紧急修复分支。
+提交信息遵循 Conventional Commits，类型有 feat 新功能、fix 修复、docs 文档、refactor 重构、test 测试、chore 杂项。
+每个 Pull Request 至少由一名其他成员评审通过后才能合并，禁止直接推送到 main 与 develop。
+CI 流水线为 .github/workflows/ci.yml，在推送或 PR 到 main、develop 时触发，构建 exp1 与 exp2/backend 的 Maven 工程以及 exp2/frontend 的 npm 工程。
+提交前自检：构建测试通过，不提交密钥与 .env，不提交构建产物，AI 生成代码已标注并人工复核。

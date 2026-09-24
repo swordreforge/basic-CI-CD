@@ -1,0 +1,5 @@
+各实验服务端口汇总：实验一 8878，实验二后端 8080、前端 5173，实验四 8081，实验五 8000，避免多实验并行冲突。
+数据库统一为 MySQL 8.x 的 selflearn 库，各实验需按自身 README 修改 application.yml 中的账号密码。
+实验一与实验二的老数据若为明文密码，需手动 UPDATE 为 BCrypt 哈希，新建与更新接口已自动加密。
+大模型配置：复制 .env.example 为 .env 后填写 LLM_BASE_URL、LLM_API_KEY、LLM_MODEL，本地 Ollama 可用 http://localhost:11434/v1。
+用户输入拼入模型前，应复用实验四 AiSecurityGuard 做提示注入检测与敏感信息脱敏，真实密钥绝不写入提示词。

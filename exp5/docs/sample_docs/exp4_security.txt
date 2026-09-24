@@ -1,0 +1,5 @@
+实验四实现登录、权限与 AI 安全，服务端口为 8081，技术栈为 Spring Security + JWT + RBAC + BCrypt。
+数据表有 t_user、t_role、t_permission、t_user_role、t_role_permission，种子账号为 admin/admin123（ADMIN 角色）与 user/user123（USER 角色）。
+登录接口为 POST /api/auth/login，返回 token，后续请求携带 Authorization: Bearer <token> 访问，只有 ADMIN 可以删除用户。
+密码使用 BCryptPasswordEncoder 加密入库，接口权限由 @PreAuthorize 控制，/api/auth/** 放行其余接口需认证。
+AI 安全由 AiSecurityGuard 实现：提示注入关键词黑名单检测、手机号身份证邮箱正则脱敏、输入 sanitize 清洗。

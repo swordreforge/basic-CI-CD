@@ -1,0 +1,6 @@
+实验一搭建 Web 基础项目，使用 Spring Boot 3.3.x + MyBatis + MySQL，JDK 17，服务端口为 8878。
+代码采用 Entity / Mapper / Service / Controller 四层结构，用户表为 t_user，字段有 id、username、password、email、create_time。
+新建与更新接口均用 BCrypt 加密后入库，更新时密码留空则保留原哈希，已是哈希不再重复加密。
+接口一览：GET /api/users 查询全部，GET /api/users/{id} 查询单个，POST /api/users 新增，PUT /api/users/{id} 修改，DELETE /api/users/{id} 删除。
+启动命令为 mvn spring-boot:run，浏览器访问 http://localhost:8878/ 打开简易用户管理页面。
+数据库名为 selflearn，建库语句为 CREATE DATABASE selflearn DEFAULT CHARACTER SET utf8mb4。
